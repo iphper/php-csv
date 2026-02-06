@@ -2,6 +2,7 @@
 
 namespace PhpCsv\Traits;
 
+// 格式化
 trait FormatTrait
 {
     protected array $fomatter = [];
