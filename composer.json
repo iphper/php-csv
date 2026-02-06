@@ -1,0 +1,16 @@
+{
+    "name": "iphper/php-csv",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "PhpCsv\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "iphper",
+            "email": "igping@163.com"
+        }
+    ],
+    "require": {}
+}
