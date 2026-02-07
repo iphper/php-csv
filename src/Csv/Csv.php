@@ -36,11 +36,6 @@ class Csv
         return $this;
     }
 
-    public function __toString() : array
-    {
-        return $this->readAll();
-    }
-
     public function json(int $flags = 0) : string
     {
         return json_encode($this->readAll(), $flags);
