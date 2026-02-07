@@ -2,9 +2,11 @@
 
 namespace PhpCsv\Exception;
 
-use Exception;
-
-class FacadeException extends Exception
+/**
+ * 门面异常类
+ * @class FacadeException
+ */
+class FacadeException extends CsvException
 {
 
 }

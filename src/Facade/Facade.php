@@ -3,7 +3,7 @@
 namespace PhpCsv\Facade;
 
 use PhpCsv\Exception\FacadeException;
-use PhpCsv\Exception\NotExists;
+use PhpCsv\Exception\NotExistsException;
 
 /**
  * 门面抽象类实现
@@ -21,7 +21,7 @@ abstract class Facade
         $class = static::accessor();
 
         if (!class_exists($class)) {
-            throw new NotExists("class $class Not Found!", 404);
+            throw new NotExistsException("class $class Not Found!", 404);
         }
         $obj = new $class();
 

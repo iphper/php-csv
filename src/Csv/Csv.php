@@ -4,13 +4,22 @@ namespace PhpCsv\Csv;
 
 use Closure;
 use PhpCsv\Exception\CsvException;
-use PhpCsv\Exception\NotExists;
+use PhpCsv\Exception\NotExistsException;
 use PhpCsv\Traits\FormatTrait;
+use PhpCsv\Traits\ExcludeTrait;
+use PhpCsv\Traits\OnlyTrait;
+use PhpCsv\Traits\ColumnTrait;
 
 class Csv 
 {
-    // 使用格式化方法
+    // 排除筛选
+    use ColumnTrait;
+    // 排除筛选
+    use OnlyTrait;
+    // 格式化
     use FormatTrait;
+    // 排除筛选
+    use ExcludeTrait;
 
     /** @var string $filename 读取文件 */
     protected string $filename = '';
@@ -59,7 +68,7 @@ class Csv
     public function readFn(Closure $fn)
     {
         if (!$this->filename || !file_exists($this->filename)) {
-            throw new NotExists($this->filename.' Not Exists!', 404);
+            throw new NotExistsException($this->filename.' Not Exists!', 404);
         }
 
         $fp = fopen($this->filename, 'r+');
@@ -67,7 +76,7 @@ class Csv
         $rowId = 0;
         while ($row = fgetcsv($fp, null, ',', '"', '\\')) {
             $row = $this->call($row);
-            $fn($row, $rowId++);
+            !empty($row) and $fn($row, $rowId++);
         }
 
         // 关闭文件
@@ -96,7 +105,7 @@ class Csv
 
         $callFn = function($row) use($fp) {
             $row = $this->call($row);
-            fputcsv($fp, $row);
+            !empty($row) and fputcsv($fp, $row);
         };
 
         // 回调添加数据
@@ -108,30 +117,27 @@ class Csv
 
     // ==========< protected methods >==========
 
-    protected function isRow($row)
+    protected function call(array $row)
     {
-        
+        return $this->traitRun(__FUNCTION__, $row);
     }
 
-    protected function call()
+    protected function traitRun(string $fnName, $row)
     {
-        return $this->traitRun(__FUNCTION__, ...func_get_args());
-    }
-
-    protected function traitRun(string $fnName, ...$args)
-    {
+        // 按use的顺序
         $uses = class_uses($this);
         foreach($uses as $use) {
             $use = explode('\\', $use);
             $use = end($use);
             $use = substr($use, 0, strlen($use) - strlen('Trait'));
             $use = lcfirst($use);
+            $fnName = ucfirst($fnName);
             $method = "$use$fnName";
             if (is_callable([$this, $method])) {
-                return $this->$method(...$args);
+                $row = $this->$method($row);
             }
         }
-        return $args;
+        return $row;
     }
 
 }
